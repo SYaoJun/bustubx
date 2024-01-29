@@ -26,7 +26,7 @@ fn main() -> Result<()> {
     info!("database created");
     let mut rl = DefaultEditor::new()?;
     loop {
-        let readline = rl.readline("bustubx=#");
+        let readline = rl.readline("bustubx=# ");
         match readline {
             Ok(line) => {
                 let _ = rl.add_history_entry(line.as_str());
