@@ -59,7 +59,7 @@ impl LRUKReplacer {
                 continue;
             }
             let k_distance = if node.history.len() < self.k {
-                std::u64::MAX - node.history.front().unwrap()
+                u64::MAX - node.history.front().unwrap()
             } else {
                 self.current_timestamp - node.history.front().unwrap()
             };
