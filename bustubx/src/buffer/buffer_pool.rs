@@ -83,12 +83,12 @@ impl BufferPoolManager {
     }
 
     pub fn fetch_page(&mut self, page_id: PageId) -> Option<&Page> {
-        if self.page_table.contains_key(&page_id) {
+        return if self.page_table.contains_key(&page_id) {
             let frame_id = self.page_table[&page_id];
             let page = &mut self.pool[frame_id as usize];
             page.pin_count += 1;
             self.replacer.set_evictable(frame_id, false);
-            return Some(page);
+            Some(page)
         } else {
             // 分配一个frame
             let frame_id = if !self.free_list.is_empty() {
@@ -116,18 +116,18 @@ impl BufferPoolManager {
             self.replacer.record_access(frame_id);
             self.replacer.set_evictable(frame_id, false);
 
-            return Some(&self.pool[frame_id as usize]);
+            Some(&self.pool[frame_id as usize])
         }
     }
 
     // 从缓冲池中获取指定页
     pub fn fetch_page_mut(&mut self, page_id: PageId) -> Option<&mut Page> {
-        if self.page_table.contains_key(&page_id) {
+        return if self.page_table.contains_key(&page_id) {
             let frame_id = self.page_table[&page_id];
             let page = &mut self.pool[frame_id as usize];
             page.pin_count += 1;
             self.replacer.set_evictable(frame_id, false);
-            return Some(page);
+            Some(page)
         } else {
             // 分配一个frame
             let frame_id = if !self.free_list.is_empty() {
@@ -155,7 +155,7 @@ impl BufferPoolManager {
             self.replacer.record_access(frame_id);
             self.replacer.set_evictable(frame_id, false);
 
-            return Some(&mut self.pool[frame_id as usize]);
+            Some(&mut self.pool[frame_id as usize])
         }
     }
 
@@ -170,7 +170,7 @@ impl BufferPoolManager {
 
     // 从缓冲池中取消固定页
     pub fn unpin_page(&mut self, page_id: PageId, is_dirty: bool) -> bool {
-        if self.page_table.contains_key(&page_id) {
+        return if self.page_table.contains_key(&page_id) {
             let frame_id = self.page_table[&page_id];
             let page = &mut self.pool[frame_id as usize];
             if page.pin_count == 0 {
@@ -181,22 +181,22 @@ impl BufferPoolManager {
             if page.pin_count == 0 {
                 self.replacer.set_evictable(frame_id, true);
             }
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 
     // 将缓冲池中指定页写回磁盘
     pub fn flush_page(&mut self, page_id: PageId) -> bool {
-        if self.page_table.contains_key(&page_id) {
+        return if self.page_table.contains_key(&page_id) {
             let frame_id = self.page_table[&page_id];
             let page = &mut self.pool[frame_id as usize];
             self.disk_manager.write_page(page_id, &page.data).unwrap();
             page.is_dirty = false;
-            return true;
+            true
         } else {
-            return false;
+            false
         }
     }
 
