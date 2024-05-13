@@ -1,33 +1,15 @@
 use bustubx::{pretty_format_tuples, BustubxResult, Database};
 use rustyline::error::ReadlineError;
 use rustyline::{DefaultEditor, Result};
-use std::io::Write;
 use tracing::info;
-use tracing_chrome::ChromeLayerBuilder;
-use tracing_subscriber::fmt;
-use tracing_subscriber::layer::SubscriberExt;
-use tracing_subscriber::util::SubscriberInitExt;
-
 fn main() -> Result<()> {
-    println!(":) Welcome to the bustubx, please input sql.");
-    /*
-    let fmt_layer = fmt::layer()
-        .with_writer(std::io::stdout)
-        .with_file(true)
-        .with_line_number(true)
-        .with_thread_ids(true)
-        .with_target(false);
-    let (chrome_layer, _guard) = ChromeLayerBuilder::new().build();
-    tracing_subscriber::registry()
-        .with(fmt_layer)
-        .with(chrome_layer)
-        .init();
-    */
+    println!(":) Welcome to the bustub-rust, please input sql.");
+    // 创建一个db对象
     let mut db = Database::new_temp().unwrap();
     info!("database created");
     let mut rl = DefaultEditor::new()?;
     loop {
-        let readline = rl.readline("bustubx=#");
+        let readline = rl.readline("bustub-rust=# ");
         match readline {
             Ok(line) => {
                 let _ = rl.add_history_entry(line.as_str());
@@ -35,6 +17,7 @@ fn main() -> Result<()> {
                     println!("bye!");
                     break;
                 }
+                // db.run()是函数入口
                 let result = db.run(&line);
                 match result {
                     Ok(tuples) => {

@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "bustubx",
-    "bustubx-cli",
+    "bustubx-cli", "practice",
     "tests/sqllogictest",
 ]
 resolver = "2"

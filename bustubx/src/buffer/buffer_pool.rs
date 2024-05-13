@@ -236,7 +236,7 @@ impl BufferPoolManager {
 mod tests {
     use crate::{buffer::BufferPoolManager, storage::DiskManager};
     use std::{fs::remove_file, sync::Arc};
-
+    // 测试创建新的页面
     #[test]
     pub fn test_buffer_pool_manager_new_page() {
         let db_path = "./test_buffer_pool_manager_new_page.db";
