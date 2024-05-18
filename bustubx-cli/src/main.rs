@@ -14,7 +14,7 @@ fn main() -> Result<()> {
             Ok(line) => {
                 let _ = rl.add_history_entry(line.as_str());
                 if line == "exit" || line == "\\q" {
-                    println!("bye!");
+                    // println!("bye!");
                     break;
                 }
                 // db.run()是函数入口

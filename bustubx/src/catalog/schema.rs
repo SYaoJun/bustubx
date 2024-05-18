@@ -87,4 +87,22 @@ impl Schema {
     pub fn column_count(&self) -> usize {
         self.columns.len()
     }
+    pub fn to_string(&self) -> String {
+        let mut s: String = String::from("(");
+        let mut is_first = true;
+        for p in self.columns.clone() {
+            if is_first {
+                is_first = false;
+            } else {
+                s.push_str(", ");
+            }
+            // println!("value = {}, {}", p.name, p.data_type);
+            // s += p.name;
+            s.push_str(&p.name);
+            s.push(':');
+            s.push_str(p.data_type.to_string().as_str());
+        }
+        s.push(')');
+        return s;
+    }
 }

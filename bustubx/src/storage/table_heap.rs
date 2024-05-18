@@ -240,7 +240,7 @@ mod tests {
         let temp_path = temp_dir.path().join("test.db");
 
         let disk_manager = DiskManager::try_new(&temp_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(10, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(10, Arc::new(disk_manager), 2);
         let table_heap = TableHeap::try_new(Arc::new(Schema::empty()), buffer_pool_manager);
         assert_eq!(table_heap.first_page_id, 0);
         assert_eq!(table_heap.last_page_id, 0);
@@ -256,7 +256,7 @@ mod tests {
             Column::new("b".to_string(), DataType::Int16, false),
         ]));
         let disk_manager = DiskManager::try_new(&temp_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut table_heap = TableHeap::try_new(schema.clone(), buffer_pool_manager);
         let meta = super::TupleMeta {
             insert_txn_id: 0,
@@ -296,7 +296,7 @@ mod tests {
             Column::new("b".to_string(), DataType::Int16, false),
         ]));
         let disk_manager = DiskManager::try_new(&temp_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut table_heap = TableHeap::try_new(schema.clone(), buffer_pool_manager);
         let meta = super::TupleMeta {
             insert_txn_id: 0,
@@ -345,7 +345,7 @@ mod tests {
             Column::new("b".to_string(), DataType::Int16, false),
         ]));
         let disk_manager = DiskManager::try_new(&temp_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut table_heap = TableHeap::try_new(schema.clone(), buffer_pool_manager);
 
         let meta1 = super::TupleMeta {
@@ -406,7 +406,7 @@ mod tests {
         ]));
 
         let disk_manager = DiskManager::try_new(&temp_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut table_heap = TableHeap::try_new(schema.clone(), buffer_pool_manager);
 
         let meta1 = super::TupleMeta {

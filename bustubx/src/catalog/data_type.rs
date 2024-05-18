@@ -8,9 +8,13 @@ pub enum DataType {
     Int32,
     Int64,
     UInt64,
+    // VarlenType,
+    // DecimalType
+    // NumericType
 }
 
 impl DataType {
+    // 实现了一个DataType中的函数
     pub fn type_size(&self) -> usize {
         match self {
             DataType::Boolean => 1,
@@ -22,7 +26,7 @@ impl DataType {
         }
     }
 }
-
+// 有一个TryFrom特种，DataType去实现了这个特征
 impl TryFrom<&sqlparser::ast::DataType> for DataType {
     type Error = BustubxError;
 
@@ -35,7 +39,7 @@ impl TryFrom<&sqlparser::ast::DataType> for DataType {
             sqlparser::ast::DataType::BigInt(_) => Ok(DataType::Int64),
             sqlparser::ast::DataType::UnsignedBigInt(_) => Ok(DataType::UInt64),
             _ => Err(BustubxError::NotSupport(format!(
-                "Not support datatype {}",
+                "unsupported datatype: {}",
                 value
             ))),
         }

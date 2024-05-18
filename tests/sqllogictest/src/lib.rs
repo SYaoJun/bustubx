@@ -12,6 +12,11 @@ impl BustubxDB {
         Self { db }
     }
 }
+impl Default for BustubxDB {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 
 fn tuples_to_sqllogictest_string(tuples: Vec<Tuple>) -> Vec<Vec<String>> {
     let mut output = vec![];

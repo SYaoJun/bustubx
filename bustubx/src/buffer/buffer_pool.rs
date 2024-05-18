@@ -27,14 +27,15 @@ pub struct BufferPoolManager {
     num_pages: usize,
 }
 impl BufferPoolManager {
-    pub fn new(num_pages: usize, disk_manager: Arc<DiskManager>) -> Self {
+    // TODO: lru-k的size需要传进来
+    pub fn new(num_pages: usize, disk_manager: Arc<DiskManager>, replacer_k: usize) -> Self {
         let mut free_list = VecDeque::with_capacity(num_pages);
         for i in 0..num_pages {
             free_list.push_back(i as FrameId);
         }
         Self {
             pool: vec![Page::new(0); num_pages],
-            replacer: LRUKReplacer::new(num_pages, 2),
+            replacer: LRUKReplacer::new(num_pages, replacer_k),
             disk_manager,
             page_table: HashMap::new(),
             free_list,
@@ -117,7 +118,7 @@ impl BufferPoolManager {
             self.replacer.set_evictable(frame_id, false);
 
             Some(&self.pool[frame_id as usize])
-        }
+        };
     }
 
     // 从缓冲池中获取指定页
@@ -156,7 +157,7 @@ impl BufferPoolManager {
             self.replacer.set_evictable(frame_id, false);
 
             Some(&mut self.pool[frame_id as usize])
-        }
+        };
     }
 
     pub fn write_page(&mut self, page_id: PageId, data: [u8; BUSTUBX_PAGE_SIZE]) {
@@ -184,7 +185,7 @@ impl BufferPoolManager {
             true
         } else {
             false
-        }
+        };
     }
 
     // 将缓冲池中指定页写回磁盘
@@ -197,7 +198,7 @@ impl BufferPoolManager {
             true
         } else {
             false
-        }
+        };
     }
 
     // 将缓冲池中的所有页写回磁盘
@@ -243,7 +244,8 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager));
+        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager), 2);
+        // 获取一个新页面
         let page = buffer_pool_manager.new_page().unwrap().clone();
         assert_eq!(page.page_id, 0);
         assert_eq!(buffer_pool_manager.pool[0].page_id, page.page_id);
@@ -271,7 +273,7 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager));
+        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager), 2);
 
         let page = buffer_pool_manager.new_page().unwrap();
         let page = buffer_pool_manager.new_page().unwrap();
@@ -292,7 +294,7 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager));
+        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager), 2);
 
         let page = buffer_pool_manager.new_page().unwrap();
         buffer_pool_manager.unpin_page(0, true);
@@ -321,7 +323,7 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager));
+        let mut buffer_pool_manager = BufferPoolManager::new(3, Arc::new(disk_manager), 2);
 
         let page_id = buffer_pool_manager.new_page().unwrap();
         buffer_pool_manager.unpin_page(0, true);

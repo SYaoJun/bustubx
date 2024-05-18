@@ -49,6 +49,7 @@ impl LogicalPlanner<'_> {
                     idents
                 ))),
             },
+            // 这里判断新增的系统函数
             _ => Err(BustubxError::NotSupport(format!(
                 "sqlparser expr {} not supported",
                 sql

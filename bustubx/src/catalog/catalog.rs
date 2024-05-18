@@ -1,4 +1,5 @@
 use std::{collections::HashMap, sync::atomic::AtomicU32};
+use std::{result, vec};
 
 use crate::buffer::TABLE_HEAP_BUFFER_POOL_SIZE;
 use crate::catalog::SchemaRef;
@@ -9,6 +10,8 @@ use crate::{
         TableHeap,
     },
 };
+
+use super::Schema;
 
 pub type TableOid = u32;
 pub type IndexOid = u32;
@@ -59,6 +62,7 @@ impl Catalog {
 
     pub fn create_table(&mut self, table_name: String, schema: SchemaRef) -> Option<&TableInfo> {
         if self.table_names.contains_key(&table_name) {
+            println!("table name already exist");
             return None;
         }
 
@@ -66,7 +70,9 @@ impl Catalog {
         let buffer_pool_manager = BufferPoolManager::new(
             TABLE_HEAP_BUFFER_POOL_SIZE,
             self.buffer_pool_manager.disk_manager.clone(),
+            3,
         );
+        // 在bustub中，table和
         let table_heap = TableHeap::try_new(schema.clone(), buffer_pool_manager);
         let table_oid = self
             .next_table_oid
@@ -81,6 +87,7 @@ impl Catalog {
         self.tables.insert(table_oid, table_info);
         self.table_names.insert(table_name.clone(), table_oid);
         self.index_names.insert(table_name, HashMap::new());
+        println!("CREATE TABLE");
         self.tables.get(&table_oid)
     }
 
@@ -125,6 +132,7 @@ impl Catalog {
         let buffer_pool_manager = BufferPoolManager::new(
             TABLE_HEAP_BUFFER_POOL_SIZE,
             self.buffer_pool_manager.disk_manager.clone(),
+            3,
         );
         // TODO compute leaf_max_size and internal_max_size
         let b_plus_tree_index = BPlusTreeIndex::new(index_metadata, buffer_pool_manager, 10, 10);
@@ -150,6 +158,7 @@ impl Catalog {
             index_names.insert(index_name, index_oid);
             self.index_names.insert(table_name, index_names);
         }
+        println!("CREATE INDEX");
         self.indexes.get(&index_oid).unwrap()
     }
 
@@ -175,6 +184,29 @@ impl Catalog {
             })
             .unwrap_or(vec![])
     }
+    pub fn get_table_names(&self) -> Vec<String> {
+        self.table_names.keys().cloned().collect()
+    }
+    pub fn generate_mock_table(&self) {
+        //
+        let mock_table_names = vec!["mock_table_1", "mock_table_2", "mock_table_3"];
+        // for (auto table_name = &mock_table_list[0]; *table_name != nullptr; table_name++) {
+        //     catalog_->CreateTable(txn, *table_name, GetMockTableSchemaOf(*table_name), false);
+        //   }
+        for v in mock_table_names {
+
+            // self.create_table(table_name, schema);
+        }
+    }
+    //  pub fn get_mock_table_schema_of(&self, table_name: String)->Schema{
+    // let mut cols:Vec<Column> = vec![];
+    // cols.push()
+    // let mut s = Schema::new(cols);
+    // if table_name == "mock_table_1" {
+
+    // }
+    // return Schema::empty();
+    //  }
 }
 
 #[cfg(test)]
@@ -193,7 +225,7 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut catalog = super::Catalog::new(buffer_pool_manager);
 
         let table_name = "test_table1".to_string();
@@ -202,6 +234,7 @@ mod tests {
             Column::new("b".to_string(), DataType::Int16, true),
             Column::new("c".to_string(), DataType::Int32, true),
         ]));
+        // 创建表：1. 表对应的页面 2. 写日志
         let table_info = catalog
             .create_table(table_name.clone(), schema.clone())
             .unwrap();
@@ -231,7 +264,7 @@ mod tests {
         let _ = remove_file(db_path);
 
         let disk_manager = DiskManager::try_new(&db_path).unwrap();
-        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager));
+        let buffer_pool_manager = BufferPoolManager::new(1000, Arc::new(disk_manager), 2);
         let mut catalog = super::Catalog::new(buffer_pool_manager);
 
         let table_name1 = "test_table1".to_string();

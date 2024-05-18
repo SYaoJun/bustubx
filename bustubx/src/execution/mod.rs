@@ -26,6 +26,9 @@ impl ExecutionEngine<'_> {
     pub fn execute(&mut self, plan: Arc<PhysicalPlan>) -> BustubxResult<Vec<Tuple>> {
         plan.init(&mut self.context)?;
         let mut result = Vec::new();
+        // 经典火山模型
+        // 1. init
+        // 2. next
         loop {
             let next_tuple = plan.next(&mut self.context)?;
             if let Some(tuple) = next_tuple {
